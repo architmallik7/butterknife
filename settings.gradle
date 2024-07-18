@@ -1,3 +1,13 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'io.harness:gradle-cache:0.0.2'
+    }
+}
+
+
 include ':butterknife'
 include ':butterknife-annotations'
 include ':butterknife-compiler'
@@ -11,3 +21,19 @@ include ':butterknife-runtime'
 //include ':sample:library'
 
 rootProject.name = 'butterknife-parent'
+
+apply plugin: 'io.harness.gradle-cache'
+
+buildCache {
+    local {
+        // Local build cache is dangerous as it might produce inconsistent results
+        // in case developer modifies files while the build is running
+        enabled = false
+    }
+    remote(io.harness.Cache) {
+        accountId = System.getenv('HARNESS_ACCOUNT_ID')
+        token = System.getenv('HARNESS_PAT')
+        push = System.getenv('CI') == "true"
+        endpoint = System.getenv('HARNESS_CACHE_SERVICE_ENDPOINT')
+    }
+}
